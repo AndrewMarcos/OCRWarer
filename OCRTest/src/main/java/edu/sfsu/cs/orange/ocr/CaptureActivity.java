@@ -17,9 +17,6 @@
 
 package edu.sfsu.cs.orange.ocr;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -62,6 +59,9 @@ import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import java.io.File;
+import java.io.IOException;
+
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
 import edu.sfsu.cs.orange.ocr.camera.ShutterButton;
 import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
@@ -85,7 +85,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
   
   /** ISO 639-1 language code indicating the default target language for translation. */
-  public static final String DEFAULT_TARGET_LANGUAGE_CODE = "es";
+  public static final String DEFAULT_TARGET_LANGUAGE_CODE = "ara";
   
   /** The default online machine translation service to use. */
   public static final String DEFAULT_TRANSLATOR = "Google Translate";
@@ -112,7 +112,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public static final boolean DEFAULT_TOGGLE_REVERSED_IMAGE = false;
   
   /** Whether to enable the use of online translation services be default. */
-  public static final boolean DEFAULT_TOGGLE_TRANSLATION = true;
+  public static final boolean DEFAULT_TOGGLE_TRANSLATION = false;
   
   /** Whether the light should be initially activated by default. */
   public static final boolean DEFAULT_TOGGLE_LIGHT = false;
