@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -62,6 +63,7 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 import java.io.File;
 import java.io.IOException;
 
+import edu.sfsu.cs.orange.ocr.DataBase.DBHelper;
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
 import edu.sfsu.cs.orange.ocr.camera.ShutterButton;
 import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
@@ -74,7 +76,7 @@ import edu.sfsu.cs.orange.ocr.language.TranslateAsyncTask;
  * 
  * The code for this class was adapted from the ZXing project: http://code.google.com/p/zxing/
  */
-public final class CaptureActivity extends Activity implements SurfaceHolder.Callback, 
+public final class CaptureActivity extends Activity implements SurfaceHolder.Callback,
   ShutterButton.OnShutterButtonListener {
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
@@ -82,7 +84,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   // Note: These constants will be overridden by any default values defined in preferences.xml.
   
   /** ISO 639-3 language code indicating the default recognition language. */
-  public static final String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
+  public static String DEFAULT_SOURCE_LANGUAGE_CODE = "eng";
   
   /** ISO 639-1 language code indicating the default target language for translation. */
   public static final String DEFAULT_TARGET_LANGUAGE_CODE = "ara";
@@ -197,7 +199,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private boolean isEngineReady;
   private boolean isPaused;
   private static boolean isFirstLaunch; // True if this is the first time the app is being run
-
+  String QR;
   Handler getHandler() {
     return handler;
   }
@@ -213,7 +215,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    
+    DEFAULT_SOURCE_LANGUAGE_CODE = getIntent().getStringExtra("Source_Language");
+    QR =  getIntent().getStringExtra("Customer_ID");
     checkFirstLaunch();
     
     if (isFirstLaunch) {
@@ -719,7 +722,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    * @param ocrResult Object representing successful OCR results
    * @return True if a non-null result was received for OCR
    */
-  boolean handleOcrDecode(OcrResult ocrResult) {
+  boolean handleOcrDecode(final OcrResult ocrResult) {
     lastResult = ocrResult;
     
     // Test whether the result is null
@@ -752,6 +755,29 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     sourceLanguageTextView.setText(sourceLanguageReadable);
     TextView ocrResultTextView = (TextView) findViewById(R.id.ocr_result_text_view);
     ocrResultTextView.setText(ocrResult.getText());
+    final DBHelper dbHelper= new DBHelper(this);
+    // show the scanner result into dialog box.
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("هل القراءة صحيحة؟");
+    builder.setMessage(ocrResult.getText());
+    builder.setPositiveButton("نعم", new DialogInterface.OnClickListener() {
+
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        dbHelper.addOrder(Integer.parseInt(QR),ocrResult.getText());
+      }
+    });
+    builder.setNegativeButton("لا", new DialogInterface.OnClickListener() {
+
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+          resumeContinuousDecoding();
+       }
+    });
+    AlertDialog alert1 = builder.create();
+
+    alert1.show();
+
     // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
     int scaledSize = Math.max(22, 32 - ocrResult.getText().length() / 4);
     ocrResultTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
