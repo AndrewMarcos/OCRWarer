@@ -13,6 +13,7 @@ import com.google.zxing.Result;
 
 import edu.sfsu.cs.orange.ocr.CaptureActivity;
 import edu.sfsu.cs.orange.ocr.R;
+import edu.sfsu.cs.orange.ocr.Services.sendService;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class MainActivity extends ActionBarActivity implements ZXingScannerView.ResultHandler{
@@ -26,6 +27,8 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
         Activity activity = this;
         view =  activity.getLayoutInflater().inflate(R.layout.activity_main,null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        Intent intentService = new Intent(this, sendService.class);
+        startService(intentService);
         builder.setTitle("اختر نوع الجهاز:");
         final CharSequence[] items = {
                 "1", "2"
