@@ -62,8 +62,10 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
 import edu.sfsu.cs.orange.ocr.DataBase.DBHelper;
+import edu.sfsu.cs.orange.ocr.Services.sendService;
 import edu.sfsu.cs.orange.ocr.camera.CameraManager;
 import edu.sfsu.cs.orange.ocr.camera.ShutterButton;
 import edu.sfsu.cs.orange.ocr.language.LanguageCodeHelper;
@@ -199,7 +201,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private boolean isEngineReady;
   private boolean isPaused;
   private static boolean isFirstLaunch; // True if this is the first time the app is being run
-  String QR;
+  Calendar c;
   Handler getHandler() {
     return handler;
   }
@@ -215,10 +217,26 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    DEFAULT_SOURCE_LANGUAGE_CODE = getIntent().getStringExtra("Source_Language");
-    QR =  getIntent().getStringExtra("Customer_ID");
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle("اختر نوع الجهاز:");
+    final CharSequence[] items = {
+            "1", "2"
+    };
+    builder.setItems(items, new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int item) {
+
+        if (items[item].equals("1")) {
+          DEFAULT_SOURCE_LANGUAGE_CODE  = "eng";
+        } else if (items[item].equals("2")) {
+          DEFAULT_SOURCE_LANGUAGE_CODE  = "ara";
+        }
+      }
+    });
+    AlertDialog alert1 = builder.create();
+    alert1.show();
     checkFirstLaunch();
-    
+    Intent in = new Intent(CaptureActivity.this,sendService.class);
+    startService(in);
     if (isFirstLaunch) {
       setDefaultPreferences();
     }
@@ -757,6 +775,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     ocrResultTextView.setText(ocrResult.getText());
     final DBHelper dbHelper= new DBHelper(this);
     // show the scanner result into dialog box.
+    c = Calendar.getInstance();
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setTitle("هل القراءة صحيحة؟");
     builder.setMessage(ocrResult.getText());
@@ -764,7 +783,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        dbHelper.addOrder(Integer.parseInt(QR),ocrResult.getText());
+        dbHelper.addOrder(ocrResult.getText().split("\n")[0],ocrResult.getText().split("\n")[1],c.getTime().getDay()+"/"+
+                (c.getTime().getMonth()+1)+"/"+c.getTime().getYear()+" "+c.getTime().getHours()+":"+c.getTime().getMinutes());
       }
     });
     builder.setNegativeButton("لا", new DialogInterface.OnClickListener() {

@@ -16,8 +16,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
     private static final String CREATE_TABLE_Reading = "CREATE TABLE "
-            + "Reading_Item" + "(" + "Person_ID" + " INTEGER PRIMARY KEY," + "Reading_No"
-            + " STRING)";
+            + "Reading_Item" + "(" + "ID" + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," + "Reading_No"
+            + " STRING,"+"Person_ID String,"+"Reading_Time String"+")";
 
     public DBHelper(Context context) {
         super(context, "Order_Items", null, 1);
@@ -38,9 +38,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean addOrder (int Person_ID, String Reading_NO){
+    public boolean addOrder (String Reading_NO,String Person_ID,String Reading_Time){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put("Reading_Time",Reading_Time);
         values.put("Person_ID",Person_ID);
         values.put("Reading_No", Reading_NO);
         long movie_row = db.insert("Reading_Items", null, values);
@@ -54,15 +55,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Cursor getOrder() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT  * "  + " FROM Reading_Items ";
+        String selectQuery = "SELECT  * "  + " FROM Reading_Item";
         Cursor c = db.rawQuery(selectQuery, null);
         if (c == null || ! c.moveToFirst()) return null;
         return c;
     }
 
+
     public void deleteOrder(int id){
         SQLiteDatabase db = this.getReadableDatabase();
-        db.delete("Rading_Items","Person_ID = "+id,null);
+        db.delete("Rading_Item","ID = "+id,null);
     }
 
 }

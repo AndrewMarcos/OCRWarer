@@ -3,27 +3,24 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="30sp"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:weightSum="10">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:numColumns="auto_fit"
-        android:id="@+id/gridView1"
-        android:layout_weight="5"
-        android:paddingBottom="30sp"
-        tools:layout="@layout/capture"/>
 
     <FrameLayout
-        android:layout_width="match_parent"
+        android:id="@+id/ocr_fragment"
+        android:layout_width="fill_parent"
         android:layout_height="0dp"
+        android:gravity="top"
         android:layout_weight="5"
-        android:id="@+id/frame_LayoutDetailed1">
-    </FrameLayout>
+        android:name="android.app.DialogFragment" />
+
+    <FrameLayout
+        android:id="@+id/qr_fragment"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:gravity="bottom"
+        android:layout_weight="5"
+        android:name="android.support.v4.app.DialogFragment" />
 
 
 </LinearLayout>
